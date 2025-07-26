@@ -1,0 +1,175 @@
+Project Execution Checklist
+This checklist translates the high-level phases from the Project Plan into concrete, actionable tasks.
+
+✅ Phase 0: Foundation & Setup (Est. 0.5 Weeks)
+The goal is to have a running, connected, "Hello World" full-stack application.
+
+[ ] Environment: Install Node.js, Docker, and Git.
+
+[ ] IDE: Install VS Code with recommended extensions (ESLint, Prettier, Prisma).
+
+[ ] Monorepo: Run npx create-nx-workspace to initialize the project.
+
+[ ] Plugins: Install @nx/next and @nx/nest dependencies.
+
+[ ] App Generation: Generate the frontend (Next.js w/ Tailwind) and backend (Nest.js) applications within Nx.
+
+[ ] Database Setup: Create docker-compose.yml for PostgreSQL at the project root.
+
+[ ] Configuration: Create a root .env file and define the DATABASE_URL.
+
+[ ] Database Service: Run docker-compose up -d and verify the container is running.
+
+[ ] ORM Setup: Install prisma and @prisma/client.
+
+[ ] ORM Init: Run npx prisma init to generate the prisma directory.
+
+[ ] Schema Definition: Update prisma/schema.prisma with the final Post and Comment models.
+
+[ ] DB Sync: Run npx prisma db push to create the tables in your local database.
+
+[ ] Client Generation: Run npx prisma generate to create the type-safe client.
+
+[ ] Scripts: Add a dev script to the root package.json to run both apps concurrently.
+
+**[ ] Verification: Run npm run dev and confirm you can access both the frontend and backend default pages in your browser.
+
+✅ Phase 1: Core Content MVP (Est. 1 Week)
+The goal is a publicly deployed, read-only blog.
+
+[ ] Backend: Service Layer
+
+Create a PrismaService in the backend and provide it globally.
+
+Generate PostModule, PostController, and PostService.
+
+Implement a post.service method to fetch all published posts.
+
+Implement a post.service method to fetch a single post by its slug.
+
+[ ] Backend: API Layer
+
+Implement the GET /api/posts endpoint in the controller.
+
+Implement the GET /api/posts/:slug endpoint in the controller.
+
+[ ] Frontend: Data Fetching
+
+Create a lib/api.ts file to centralize fetch calls to your backend.
+
+[ ] Frontend: UI
+
+Build the Home page (/app/page.tsx) to fetch and display a list of post titles.
+
+Create a reusable <PostCard> component.
+
+Build the dynamic Post Detail page (/app/posts/[slug]/page.tsx).
+
+Install react-markdown and use it to render post content.
+
+[ ] Data Seeding: Manually add 2-3 sample posts to your local database to test with.
+
+[ ] Deployment:
+
+Push the project to a new GitHub repository.
+
+Deploy the frontend to Vercel.
+
+Deploy the database to Neon/Supabase.
+
+Deploy the backend to Railway/Fly.io, ensuring production environment variables are set.
+
+**[ ] Verification: Access your live Vercel URL and confirm you can see the posts.
+
+✅ Phase 2: Admin Panel & CMS (Est. 1.5 Weeks)
+The goal is for you to be able to log in and manage content.
+
+[ ] Backend: Authentication
+
+Install @nestjs/jwt and @nestjs/passport.
+
+Generate the AuthModule.
+
+Implement LocalStrategy (for password check) and JwtStrategy (for token validation).
+
+Implement the POST /api/auth/login endpoint to return a JWT.
+
+[ ] Backend: Authorization
+
+Create a JwtAuthGuard to protect routes.
+
+Generate an AdminModule with a controller protected by the JwtAuthGuard.
+
+[ ] Backend: Admin APIs
+
+Implement all protected admin endpoints: GET, POST, PUT, DELETE for posts.
+
+Update the PostService with the corresponding create, update, and delete logic. Ensure slug generation from the title upon creation.
+
+[ ] Frontend: State & Routing
+
+Create a simple state management solution (e.g., React Context) to handle the auth token.
+
+Create a protected layout for the /admin route group that redirects unauthenticated users.
+
+[ ] Frontend: Admin UI
+
+Build the Login page (/app/login/page.tsx).
+
+Build the Admin Dashboard (/app/admin/page.tsx) to list all posts with edit/delete buttons.
+
+Build the New/Edit Post page (/app/admin/new and /app/admin/edit/[id]).
+
+Integrate a Markdown editor component into the New/Edit page.
+
+**[ ] Verification: Perform a full end-to-end test: log in, create a new post, see it on the homepage, edit it, and then delete it.
+
+✅ Phase 3: User Interaction (Est. 1 Week)
+The goal is to allow readers to leave comments.
+
+[ ] Backend: API
+
+Generate the CommentModule, CommentController, and CommentService.
+
+Implement the service methods to get comments for a post and create a new comment.
+
+Implement the GET and POST endpoints in the controller.
+
+(Optional) Add basic rate-limiting to the POST endpoint.
+
+[ ] Frontend: UI
+
+Create a <CommentSection> component marked as a Client Component ('use client').
+
+Inside the component, fetch and display the list of existing comments.
+
+Create a <CommentForm> for users to input a username and their comment.
+
+[ ] Frontend: Interaction
+
+Implement the form submission logic to POST the new comment to the backend.
+
+Upon successful submission, update the UI to show the new comment (either by re-fetching or through optimistic UI updates).
+
+**[ ] Verification: Visit a post page, leave a comment, and refresh the page to ensure it persists.
+
+✅ Phase 4: Polish & Launch (Est. 1 Week)
+The goal is to production-harden the application and officially launch.
+
+[ ] Design: Perform a full responsive design review on a mobile device.
+
+[ ] UX: Add hover/focus states to all interactive elements. Create a site footer.
+
+[ ] Performance: Run Lighthouse audits and address major issues.
+
+[ ] SEO: Implement dynamic <title> and <meta> tags for all pages using Next.js's metadata API.
+
+[ ] SEO: Generate and include a sitemap.xml.
+
+[ ] Domain: Purchase a personal domain name.
+
+[ ] DNS: Configure the custom domain in Vercel and update your DNS records.
+
+[ ] Content: Write 1-3 high-quality initial posts.
+
+**[ ] Launch: Share your new blog with the world!
