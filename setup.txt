@@ -1,0 +1,177 @@
+Project Setup & Environment Guide (Project "Codex")
+Version: 1.0
+
+Purpose: This document provides the explicit, step-by-step commands and configurations required to establish the complete local development environment for Project "Codex". It is the practical execution guide for Phase 0 of the main Project Plan.
+
+1.0 Prerequisites
+Before proceeding, ensure the following software is installed and accessible from your system's terminal.
+
+Node.js: Version 18.x or higher. (We recommend using nvm to manage Node versions).
+
+Docker & Docker Compose: Required to run the local PostgreSQL database.
+
+Git: For version control.
+
+VS Code (Recommended): With the following extensions:
+
+ESLint
+
+Prettier - Code formatter
+
+Prisma
+
+2.0 Phase 0: Step-by-Step Environment Setup
+Follow these steps precisely to build your development environment.
+
+Step 1: Initialize the Monorepo
+We will use Nx to create our monorepo, which provides powerful tooling for managing multi-application projects.
+
+Open your terminal and navigate to the directory where you want to create your project.
+
+Run the Nx initialization command:
+
+npx create-nx-workspace@latest codex-monorepo
+
+When prompted, choose the following options:
+
+Which stack do you want to use? -> None (We will add apps manually)
+
+Package Manager -> npm (or your preference)
+
+Navigate into your new project directory:
+
+cd codex-monorepo
+
+Step 2: Generate Frontend & Backend Applications
+Now, we'll create the Next.js and Nest.js applications inside our monorepo.
+
+Add Next.js & Nest.js plugins to Nx:
+
+npm install --save-dev @nx/next @nx/nest
+
+Generate the Next.js Frontend App:
+
+nx g @nx/next:app frontend
+
+Accept the defaults, but when asked for Styling, choose Tailwind CSS.
+
+Generate the Nest.js Backend App:
+
+nx g @nx/nest:app backend
+
+Accept the defaults.
+
+Step 3: Set Up the Local Database
+We will use Docker Compose to run a PostgreSQL instance locally.
+
+At the root of your codex-monorepo directory, create a file named docker-compose.yml.
+
+Paste the following content into it:
+
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: codex_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+
+At the root of the monorepo, create a .env file for your database connection string. This file should be added to .gitignore. Paste the following line into it:
+
+DATABASE_URL="postgresql://myuser:mypassword@localhost:5432/codex_db"
+
+Start the database container:
+
+docker-compose up -d
+
+You can verify it's running with docker ps.
+
+Step 4: Integrate Prisma
+Now, let's connect our Nest.js backend to the database using Prisma.
+
+Install Prisma dependencies in the backend app. Because we are in a monorepo, we install them at the root.
+
+npm install prisma --save-dev
+npm install @prisma/client
+
+Initialize Prisma within the backend application's directory structure.
+
+npx prisma init --datasource-provider postgresql
+
+This command creates a prisma directory with a schema.prisma file and updates your .env file.
+
+Configure your Prisma Schema. Open the newly created prisma/schema.prisma file and replace its content with our defined models:
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Post {
+  id        Int       @id @default(autoincrement())
+  title     String    @unique
+  slug      String    @unique
+  content   String
+  published Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  comments  Comment[]
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  username  String
+  content   String
+  createdAt DateTime @default(now())
+  post      Post     @relation(fields: [postId], references: [id])
+  postId    Int
+}
+
+Push the schema to your database. This command reads your schema and creates the corresponding tables (Post, Comment) in your running Docker database.
+
+npx prisma db push
+
+Generate the Prisma Client. This creates the type-safe client you'll use in your services.
+
+npx prisma generate
+
+Step 5: Run the Full Stack
+Your environment is now fully configured.
+
+Install all dependencies for the monorepo:
+
+npm install
+
+Run both applications concurrently. Nx makes this easy. Open your root package.json and add the following script:
+
+"scripts": {
+  "dev": "nx run-many --target=serve --all"
+},
+
+Now, start everything with one command:
+
+npm run dev
+
+3.0 Environment Ready
+You have successfully completed Phase 0. Your local environment is now running with:
+
+A Next.js frontend application.
+
+A Nest.js backend application.
+
+A PostgreSQL database running in Docker.
+
+Prisma connected to the database and ready for use in your backend.
