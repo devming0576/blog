@@ -1,0 +1,238 @@
+Project Plan: Personal Brand & Tech Blog (Project "Codex")
+Version: 1.0
+
+Date: July 25, 2025
+
+Authored By:
+
+Project Lead / Developer: You
+
+Chief Architect: Gemini
+
+1.0 Executive Summary
+This project outlines the development of a modern, high-performance, and scalable personal technology blog platform. It is engineered not merely as a content delivery tool, but as a comprehensive showcase of the project lead's technical capabilities, a perfect portfolio piece for career advancement, and the digital cornerstone of a future personal brand.
+
+Core Functionality:
+
+A public-facing interface for reading articles and submitting anonymous comments.
+
+A secure, admin-only backend for creating, editing, and managing articles via Markdown.
+
+Target Users:
+
+Readers: Internet users interested in technology, programming, and the author's shared content.
+
+Administrator: The blog owner (You).
+
+2.0 Guiding Principles
+The following core principles will govern all technical decisions:
+
+Developer Experience First: Prioritize tools and patterns that maximize development efficiency and enjoyment. A happy developer builds superior products.
+
+Clear Separation of Concerns: The frontend is exclusively responsible for user experience and presentation; the backend is exclusively responsible for business logic and data. Communication occurs via a standardized API contract, ensuring high decoupling.
+
+End-to-End Type Safety: From the database schema to the API layer to the frontend UI, we will leverage TypeScript and Prisma to enforce full-stack type safety, maximally reducing runtime errors.
+
+Deployment-Ready from Day One: All development work will be conducted in an environment that mirrors production as closely as possible, with automated CI/CD pipelines established from the outset.
+
+Security by Design: Security measures, particularly for administrative access, are to be considered integral to the architectural design phase, not as an afterthought.
+
+3.0 Technology Stack & Justification
+Layer
+
+Technology Selection
+
+Justification
+
+Frontend
+
+Next.js (App Router)
+
+The de-facto standard for the React ecosystem, offering hybrid SSG/SSR rendering capabilities for superior performance and SEO.
+
+Backend
+
+Nest.js
+
+An enterprise-grade Node.js framework built on TypeScript. Its modularity and Dependency Injection design enable highly maintainable and scalable backend services.
+
+Database ORM
+
+Prisma
+
+A next-generation ORM providing an unparalleled, type-safe database access experience. Integrates flawlessly with Nest.js and PostgreSQL.
+
+Database
+
+PostgreSQL
+
+The most powerful open-source relational database, renowned for performance, extensibility, and robust community support. The preferred choice for modern applications.
+
+Code Repository
+
+Monorepo (w/ Nx or Turborepo)
+
+Manages frontend and backend code within a single repository, facilitating code sharing (especially type definitions) and simplifying dependency management and build processes.
+
+4.0 System Architecture
+Database Schema (schema.prisma): [As defined in our previous communication, containing Post and Comment models and their relation. This model is considered final.]
+
+API Contract: The backend will strictly adhere to the following RESTful API design.
+
+// --- Public APIs ---
+GET    /api/posts                  // Fetches a list of all published posts
+GET    /api/posts/:slug            // Fetches a single post by its slug
+GET    /api/posts/:postId/comments // Fetches all comments for a post
+POST   /api/posts/:postId/comments // Creates a new comment for a post
+
+// --- Admin Auth APIs ---
+POST   /api/auth/login             // Administrator login
+
+// --- Protected Admin APIs (Requires JWT) ---
+GET    /api/admin/posts            // Fetches all posts (including drafts)
+POST   /api/admin/posts            // Creates a new post
+PUT    /api/admin/posts/:id        // Updates an existing post
+DELETE /api/admin/posts/:id        // Deletes a post
+
+5.0 DevOps Strategy
+Environment Strategy:
+
+Local: Utilize docker-compose to run a local, simulated PostgreSQL database. Frontend and backend are started via dev scripts.
+
+Production: Deployed on public cloud infrastructure.
+
+Version Control: Employ a simplified Git Flow.
+
+main: The primary branch, always in a deployable state, mirroring the production environment.
+
+develop: The main development branch. All new features are branched from here.
+
+feat/...: Feature branches (e.g., feat/comments). Merged back into develop upon completion.
+
+Containerization: Author a Dockerfile for the Nest.js backend application to ensure environmental consistency.
+
+Continuous Integration/Continuous Deployment (CI/CD):
+
+Tool: GitHub Actions.
+
+Workflow: Pushing to the main branch automatically triggers the CI/CD pipeline:
+
+Run tests (Lint, Unit Tests).
+
+Build the frontend application and the backend Docker image.
+
+Deploy the frontend application to Vercel.
+
+Push the backend Docker image to a registry (e.g., Docker Hub) and deploy to the cloud host.
+
+Hosting:
+
+Frontend (Next.js): Vercel. Provides seamless integration with Next.js, a global CDN, and a generous free tier.
+
+Backend (Nest.js): Railway or Fly.io. These platforms offer excellent Docker support, a simple deployment experience, and free tiers.
+
+Database (PostgreSQL): Neon or Supabase. Provide dedicated, managed cloud database services with robust free tiers.
+
+6.0 Phased Execution Roadmap
+The project is decomposed into manageable sprints, each with clear objectives and deliverables.
+
+Phase 0: Foundation & Setup (Est. 0.5 Weeks)
+
+Objective: Build the project skeleton and ensure the toolchain is operational.
+
+Deliverables:
+
+Initialized Monorepo using Nx or Turborepo.
+
+ESLint, Prettier, and TypeScript configured.
+
+Local Dockerized PostgreSQL instance runs successfully.
+
+"Hello World" frontend and backend applications can start and communicate.
+
+prisma.schema file created and the initial database migration is complete.
+
+Phase 1: Core Content MVP (Est. 1 Week)
+
+Objective: Implement the core "read-only" functionality of the blog.
+
+Deliverables:
+
+Backend: GET /posts and GET /posts/:slug endpoints are developed and tested.
+
+Frontend: The Home page (post list) and Post Detail page are developed.
+
+Data can be manually seeded into the database and is correctly displayed by the frontend.
+
+Initial deployment to Vercel and Railway is completed, resulting in a publicly accessible, read-only blog.
+
+Phase 2: Admin Panel & CMS (Est. 1.5 Weeks)
+
+Objective: Implement secure content creation and management capabilities.
+
+Deliverables:
+
+Backend: The AuthModule is complete, providing a login endpoint and a JWT validation Guard.
+
+Backend: All protected admin APIs (POST, PUT, DELETE) are developed.
+
+Frontend: The /admin route is created, including a login page, post management list, and a Markdown-based new/edit page.
+
+Milestone: The administrator can perform end-to-end login, publishing, and management of articles.
+
+Phase 3: User Interaction (Est. 1 Week)
+
+Objective: Implement the commenting feature.
+
+Deliverables:
+
+Backend: The CommentModule APIs are developed.
+
+Frontend: An interactive comment section component (displaying comments, submitting new ones) is developed for the Post Detail page.
+
+Basic anti-spam measures (e.g., backend rate-limiting) are in place.
+
+Phase 4: Polish & Launch (Est. 1 Week)
+
+Objective: Conduct a full review and optimization of the project for its official launch.
+
+Deliverables:
+
+Responsive Design QA: Ensure an excellent reading experience on mobile, tablet, and desktop.
+
+Performance Optimization: Image lazy-loading, code-splitting, Lighthouse score improvements.
+
+SEO Optimization: Appropriate <title> and <meta> tags are implemented for all pages.
+
+A personal domain is purchased and configured.
+
+1-3 initial articles are written and officially published.
+
+7.0 Risk Assessment & Mitigation
+Risk 1 (Technical): Underestimating the complexity of Nest.js or Prisma, leading to development delays.
+
+Mitigation: Adhere strictly to official documentation. Build from the simplest modules outwards. Prioritize official issue trackers and Stack Overflow for problem-solving.
+
+Risk 2 (Scope): Scope creep; the temptation to add "cool" but non-essential features (e.g., full-text search, likes) before core functionality is complete.
+
+Mitigation: Strict adherence to the phased roadmap. All new ideas are to be logged in a "Future Features" backlog and considered only after v1.0 is successfully launched.
+
+Risk 3 (Security): Flaws in the backend authentication logic leading to unauthorized access.
+
+Mitigation: Allocate sufficient time during Phase 2 to rigorously test the AuthModule and AuthGuard. Use mature, battle-tested libraries (e.g., @nestjs/jwt) and do not "roll your own" cryptography.
+
+8.0 Definition of Success
+Functional Criteria:
+
+Visitors can fluidly browse the post list and post detail pages.
+
+Visitors can successfully submit comments and see them appear immediately.
+
+The administrator can log in to the admin panel and perform all CRUD operations on posts.
+
+Non-Functional Criteria:
+
+Core pages achieve a Google Lighthouse performance score of >90.
+
+The codebase has reasonable test coverage (Unit/Integration tests).
+
