@@ -1,0 +1,82 @@
+UI/UX Wireframe Guide (v2)
+This guide extends our initial design to seamlessly integrate search and content labeling, ensuring the new features feel intentional, intuitive, and consistent with our established aesthetic.
+
+1. Design Philosophy: "Clarity & Focus"
+Our core principles remain the same. We prioritize typography, generous white space, a neutral palette with a single vibrant accent color, and subtle materiality. The goal is to make the interface feel calm, responsive, and subordinate to the content.
+
+2. Global UI Elements
+These are elements that will appear across multiple pages.
+
+The Header (Updated):
+
+Left Side: Your name/logo remains unchanged.
+
+Right Side: The "About" link is now joined by a Search Icon (a simple, elegant magnifying glass).
+
+Search Interaction: By default, only the icon is visible. When a user clicks the icon, it smoothly transitions into a rounded, capsule-shaped search bar that extends inwards. The rest of the header fades slightly to bring focus to the search input. The placeholder text simply says "Search...". Pressing Enter or clicking the icon again submits the search. This interaction is clean, animated, and doesn't clutter the UI by default.
+
+Label "Pills":
+
+This is the visual representation for a single label/tag.
+
+Appearance: A small, pill-shaped container with fully rounded corners. It has a very light gray background (e.g., #E8E8ED) and the label text inside is in a slightly darker gray.
+
+Interaction: When hovered, the background of the pill changes to our main accent color, and the text inside becomes white. This provides clear feedback that it's a clickable element.
+
+3. Page-by-Page Descriptions
+The Homepage (Updated):
+
+Header: Features the new search functionality as described above.
+
+Post Card: The structure of each card is enhanced:
+
+Title (Bold)
+
+Metadata (Date)
+
+Excerpt (2-3 lines of summary)
+
+Labels (New): Below the excerpt, a horizontal row of the new Label "Pills" is displayed. We show a maximum of 3-4 labels to keep the layout clean.
+
+The Post Page (Updated):
+
+Article Header Area: The structure is now:
+
+Title (Large, bold)
+
+Labels (New): A row of clickable Label "Pills" appears directly below the title, visually connecting the article to its categories.
+
+Metadata: Below the labels, your name and the publication date are shown.
+
+The rest of the page (article body, comment section) remains the same to preserve the focused reading experience.
+
+The Admin Page (Updated):
+
+New/Edit Post Page:
+
+Below the "Title" input field, there is a new "Labels" input field.
+
+UX: This is a "tag input" field. As you type, it can suggest existing labels. When you press Enter or a comma, the text you typed turns into a removable Label "Pill" right inside the input box. This is an intuitive and standard way to manage tags.
+
+4. New Page Designs
+These are entirely new pages required to support the new features.
+
+The Search Results Page:
+
+URL: /search?q=your-query
+
+Header: The header is present, and the search bar can remain open, populated with the user's current query.
+
+Hero Section: A simple, clear title like: Search Results for "Prisma".
+
+Content: If results are found, the page displays a list of post cards, identical in format to the homepage. If no results are found, it displays a clean, centered message: "No posts found. Try another search."
+
+The Label Archive Page:
+
+URL: /labels/react
+
+Header: The standard site header.
+
+Hero Section: A title that clearly states the context, for example: Posts tagged with "React". The word "React" itself is rendered inside a static, non-interactive version of our Label Pill for visual consistency.
+
+Content: The page displays a list of post cards, identical in format to the homepage, for all articles that have been assigned that specific label.

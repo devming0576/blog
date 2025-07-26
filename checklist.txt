@@ -1,175 +1,125 @@
-Project Execution Checklist
-This checklist translates the high-level phases from the Project Plan into concrete, actionable tasks.
+项目执行清单 (v2)
+此清单将项目计划中的高级阶段分解为具体的、可操作的任务。
 
-✅ Phase 0: Foundation & Setup (Est. 0.5 Weeks)
-The goal is to have a running, connected, "Hello World" full-stack application.
+✅ Phase 0: 奠基与设置 (Est. 0.5 Weeks)
+目标是拥有一个可运行、已连接的 "Hello World" 全栈应用。
 
-[ ] Environment: Install Node.js, Docker, and Git.
+[ ] 环境: 安装 Node.js, Docker, Git。
 
-[ ] IDE: Install VS Code with recommended extensions (ESLint, Prettier, Prisma).
+[ ] IDE: 安装 VS Code 及推荐插件。
 
-[ ] Monorepo: Run npx create-nx-workspace to initialize the project.
+[ ] Monorepo: 初始化 Nx 项目。
 
-[ ] Plugins: Install @nx/next and @nx/nest dependencies.
+[ ] 插件: 安装 @nx/next 和 @nx/nest。
 
-[ ] App Generation: Generate the frontend (Next.js w/ Tailwind) and backend (Nest.js) applications within Nx.
+[ ] 应用生成: 生成 frontend 和 backend 应用。
 
-[ ] Database Setup: Create docker-compose.yml for PostgreSQL at the project root.
+[ ] 数据库设置: 创建 docker-compose.yml。
 
-[ ] Configuration: Create a root .env file and define the DATABASE_URL.
+[ ] 配置: 创建 .env 文件并定义 DATABASE_URL。
 
-[ ] Database Service: Run docker-compose up -d and verify the container is running.
+[ ] 数据库服务: 运行 docker-compose up -d。
 
-[ ] ORM Setup: Install prisma and @prisma/client.
+[ ] ORM 设置: 安装 prisma 和 @prisma/client。
 
-[ ] ORM Init: Run npx prisma init to generate the prisma directory.
+[ ] ORM 初始化: 运行 npx prisma init。
 
-[ ] Schema Definition: Update prisma/schema.prisma with the final Post and Comment models.
+[ ] Schema 定义: 使用 v2 版本的 schema 更新 prisma/schema.prisma。
 
-[ ] DB Sync: Run npx prisma db push to create the tables in your local database.
+[ ] DB 同步: 运行 npx prisma db push。
 
-[ ] Client Generation: Run npx prisma generate to create the type-safe client.
+[ ] Client 生成: 运行 npx prisma generate。
 
-[ ] Scripts: Add a dev script to the root package.json to run both apps concurrently.
+[ ] 脚本: 添加 dev 脚本到 package.json。
 
-**[ ] Verification: Run npm run dev and confirm you can access both the frontend and backend default pages in your browser.
+**[ ] 验证: 运行 npm run dev 并确认可以访问前后端。
 
-✅ Phase 1: Core Content MVP (Est. 1 Week)
-The goal is a publicly deployed, read-only blog.
+✅ Phase 1: 核心内容MVP (Est. 1 Week)
+目标是一个可公开部署的、只读的博客。
 
-[ ] Backend: Service Layer
+[ ] 后端: 服务层: 创建 PrismaService；生成 PostModule；实现获取文章列表和详情的方法。
 
-Create a PrismaService in the backend and provide it globally.
+[ ] 后端: API 层: 实现 GET /api/posts 和 GET /api/posts/:slug 接口。
 
-Generate PostModule, PostController, and PostService.
+[ ] 前端: 数据获取: 创建 lib/api.ts 文件。
 
-Implement a post.service method to fetch all published posts.
+[ ] 前端: UI: 构建首页和文章详情页；创建 <PostCard> 组件；使用 react-markdown 渲染内容。
 
-Implement a post.service method to fetch a single post by its slug.
+[ ] 数据填充: 手动向本地数据库添加2-3篇示例文章。
 
-[ ] Backend: API Layer
+[ ] 部署: 推送至GitHub；部署前端到Vercel；部署数据库到Neon/Supabase；部署后端到Railway/Fly.io。
 
-Implement the GET /api/posts endpoint in the controller.
+**[ ] 验证: 访问你的线上URL并确认可以看到文章。
 
-Implement the GET /api/posts/:slug endpoint in the controller.
+✅ Phase 2: 管理员后台与内容管理 (Est. 1.5 Weeks)
+目标是让你能够登录并管理内容，包括标签。
 
-[ ] Frontend: Data Fetching
+[ ] 后端: 认证与授权: 实现 AuthModule，包含登录逻辑和 JwtAuthGuard。
 
-Create a lib/api.ts file to centralize fetch calls to your backend.
+[ ] 后端: 标签管理:
 
-[ ] Frontend: UI
+生成 LabelModule。
 
-Build the Home page (/app/page.tsx) to fetch and display a list of post titles.
+实现创建、查找标签的服务逻辑。
 
-Create a reusable <PostCard> component.
+[ ] 后端: 文章管理 API:
 
-Build the dynamic Post Detail page (/app/posts/[slug]/page.tsx).
+实现受保护的文章管理API (GET, POST, PUT, DELETE)。
 
-Install react-markdown and use it to render post content.
+在创建/更新文章的逻辑中，处理文章与标签的多对多关系。
 
-[ ] Data Seeding: Manually add 2-3 sample posts to your local database to test with.
+[ ] 前端: 状态与路由: 创建 Auth Context 来管理JWT；创建受保护的 /admin 路由。
 
-[ ] Deployment:
+[ ] 前端: 管理后台 UI:
 
-Push the project to a new GitHub repository.
+构建登录页、后台仪表盘（文章列表）。
 
-Deploy the frontend to Vercel.
+构建新建/编辑文章页面。
 
-Deploy the database to Neon/Supabase.
+在新建/编辑页面中集成一个标签输入组件。
 
-Deploy the backend to Railway/Fly.io, ensuring production environment variables are set.
+**[ ] 验证: 端到端测试：登录、创建一篇带标签的文章、编辑它、然后删除它。
 
-**[ ] Verification: Access your live Vercel URL and confirm you can see the posts.
+✅ Phase 3: 内容发现与互动 (Est. 1.5 Weeks)
+目标是实现搜索、按标签筛选和评论功能。
 
-✅ Phase 2: Admin Panel & CMS (Est. 1.5 Weeks)
-The goal is for you to be able to log in and manage content.
+[ ] 搜索功能:
 
-[ ] Backend: Authentication
+[ ] 后端: 实现 GET /api/search?q=:query 接口，进行简单的数据库查询。
 
-Install @nestjs/jwt and @nestjs/passport.
+[ ] 前端: 在全局 Header 中实现搜索图标和输入框的交互。
 
-Generate the AuthModule.
+[ ] 前端: 创建搜索结果页 (/search)。
 
-Implement LocalStrategy (for password check) and JwtStrategy (for token validation).
+[ ] 标签功能:
 
-Implement the POST /api/auth/login endpoint to return a JWT.
+[ ] 后端: 实现 GET /api/labels/:name 接口，返回特定标签下的所有文章。
 
-[ ] Backend: Authorization
+[ ] 前端: 创建标签归档页 (/labels/:name)。
 
-Create a JwtAuthGuard to protect routes.
+[ ] 前端: 在首页的文章卡片和文章详情页中，展示可点击的标签"Pills"。
 
-Generate an AdminModule with a controller protected by the JwtAuthGuard.
+[ ] 评论功能:
 
-[ ] Backend: Admin APIs
+[ ] 后端: 实现 CommentModule 的API。
 
-Implement all protected admin endpoints: GET, POST, PUT, DELETE for posts.
+[ ] 前端: 创建可交互的 <CommentSection> 组件。
 
-Update the PostService with the corresponding create, update, and delete logic. Ensure slug generation from the title upon creation.
+**[ ] 验证: 测试搜索功能；点击标签能跳转到归档页；可以成功留言。
 
-[ ] Frontend: State & Routing
+✅ Phase 4: 打磨、优化与上线 (Est. 1 Week)
+目标是产品化并正式发布。
 
-Create a simple state management solution (e.g., React Context) to handle the auth token.
+[ ] 设计: 进行全面的响应式设计审查。
 
-Create a protected layout for the /admin route group that redirects unauthenticated users.
+[ ] UX: 添加悬停/焦点状态；创建网站页脚。
 
-[ ] Frontend: Admin UI
+[ ] 性能: 运行 Lighthouse 审计并解决问题。
 
-Build the Login page (/app/login/page.tsx).
+[ ] SEO: 实现动态 <title> 和 <meta> 标签；生成 sitemap.xml。
 
-Build the Admin Dashboard (/app/admin/page.tsx) to list all posts with edit/delete buttons.
+[ ] 域名: 购买并配置个人域名。
 
-Build the New/Edit Post page (/app/admin/new and /app/admin/edit/[id]).
+[ ] 内容: 撰写1-3篇高质量的初始文章。
 
-Integrate a Markdown editor component into the New/Edit page.
-
-**[ ] Verification: Perform a full end-to-end test: log in, create a new post, see it on the homepage, edit it, and then delete it.
-
-✅ Phase 3: User Interaction (Est. 1 Week)
-The goal is to allow readers to leave comments.
-
-[ ] Backend: API
-
-Generate the CommentModule, CommentController, and CommentService.
-
-Implement the service methods to get comments for a post and create a new comment.
-
-Implement the GET and POST endpoints in the controller.
-
-(Optional) Add basic rate-limiting to the POST endpoint.
-
-[ ] Frontend: UI
-
-Create a <CommentSection> component marked as a Client Component ('use client').
-
-Inside the component, fetch and display the list of existing comments.
-
-Create a <CommentForm> for users to input a username and their comment.
-
-[ ] Frontend: Interaction
-
-Implement the form submission logic to POST the new comment to the backend.
-
-Upon successful submission, update the UI to show the new comment (either by re-fetching or through optimistic UI updates).
-
-**[ ] Verification: Visit a post page, leave a comment, and refresh the page to ensure it persists.
-
-✅ Phase 4: Polish & Launch (Est. 1 Week)
-The goal is to production-harden the application and officially launch.
-
-[ ] Design: Perform a full responsive design review on a mobile device.
-
-[ ] UX: Add hover/focus states to all interactive elements. Create a site footer.
-
-[ ] Performance: Run Lighthouse audits and address major issues.
-
-[ ] SEO: Implement dynamic <title> and <meta> tags for all pages using Next.js's metadata API.
-
-[ ] SEO: Generate and include a sitemap.xml.
-
-[ ] Domain: Purchase a personal domain name.
-
-[ ] DNS: Configure the custom domain in Vercel and update your DNS records.
-
-[ ] Content: Write 1-3 high-quality initial posts.
-
-**[ ] Launch: Share your new blog with the world!
+**[ ] 上线: 向世界分享你的新博客！

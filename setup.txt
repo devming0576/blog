@@ -1,18 +1,18 @@
-Project Setup & Environment Guide (Project "Codex")
-Version: 1.0
+项目设置与环境指南 (Project "Codex") v2
+版本: 2.0
 
-Purpose: This document provides the explicit, step-by-step commands and configurations required to establish the complete local development environment for Project "Codex". It is the practical execution guide for Phase 0 of the main Project Plan.
+目的: 本文档提供为 "Codex" 项目建立完整本地开发环境所需的明确、分步的命令和配置。它是主项目计划中 Phase 0 的实践执行指南。
 
-1.0 Prerequisites
-Before proceeding, ensure the following software is installed and accessible from your system's terminal.
+1.0 先决条件
+在继续之前，请确保你的系统终端已安装并可访问以下软件。
 
-Node.js: Version 18.x or higher. (We recommend using nvm to manage Node versions).
+Node.js: 版本 18.x 或更高 (推荐使用 nvm 管理Node版本)。
 
-Docker & Docker Compose: Required to run the local PostgreSQL database.
+Docker & Docker Compose: 用于运行本地PostgreSQL数据库。
 
-Git: For version control.
+Git: 用于版本控制。
 
-VS Code (Recommended): With the following extensions:
+VS Code (推荐): 并安装以下插件：
 
 ESLint
 
@@ -20,53 +20,53 @@ Prettier - Code formatter
 
 Prisma
 
-2.0 Phase 0: Step-by-Step Environment Setup
-Follow these steps precisely to build your development environment.
+2.0 Phase 0: 分步环境设置
+请精确按照以下步骤来构建你的开发环境。
 
-Step 1: Initialize the Monorepo
-We will use Nx to create our monorepo, which provides powerful tooling for managing multi-application projects.
+步骤 1: 初始化 Monorepo
+我们将使用 Nx 来创建我们的 monorepo。
 
-Open your terminal and navigate to the directory where you want to create your project.
+打开终端，并导航到你希望创建项目的目录。
 
-Run the Nx initialization command:
+运行 Nx 初始化命令：
 
 npx create-nx-workspace@latest codex-monorepo
 
-When prompted, choose the following options:
+在提示时，选择以下选项：
 
-Which stack do you want to use? -> None (We will add apps manually)
+Which stack do you want to use? -> None (我们将手动添加应用)
 
-Package Manager -> npm (or your preference)
+Package Manager -> npm (或你的偏好)
 
-Navigate into your new project directory:
+进入你的新项目目录：
 
 cd codex-monorepo
 
-Step 2: Generate Frontend & Backend Applications
-Now, we'll create the Next.js and Nest.js applications inside our monorepo.
+步骤 2: 生成前端和后端应用
+现在，我们将在 monorepo 内创建 Next.js 和 Nest.js 应用。
 
-Add Next.js & Nest.js plugins to Nx:
+为 Nx 添加 Next.js & Nest.js 插件：
 
 npm install --save-dev @nx/next @nx/nest
 
-Generate the Next.js Frontend App:
+生成 Next.js 前端应用：
 
 nx g @nx/next:app frontend
 
-Accept the defaults, but when asked for Styling, choose Tailwind CSS.
+接受默认选项，但在被问及 Styling 时，选择 Tailwind CSS。
 
-Generate the Nest.js Backend App:
+生成 Nest.js 后端应用：
 
 nx g @nx/nest:app backend
 
-Accept the defaults.
+接受默认选项。
 
-Step 3: Set Up the Local Database
-We will use Docker Compose to run a PostgreSQL instance locally.
+步骤 3: 设置本地数据库
+我们将使用 Docker Compose 在本地运行一个 PostgreSQL 实例。
 
-At the root of your codex-monorepo directory, create a file named docker-compose.yml.
+在 codex-monorepo 目录的根目录下，创建一个名为 docker-compose.yml 的文件。
 
-Paste the following content into it:
+将以下内容粘贴到其中：
 
 version: '3.8'
 services:
@@ -85,31 +85,27 @@ services:
 volumes:
   postgres_data:
 
-At the root of the monorepo, create a .env file for your database connection string. This file should be added to .gitignore. Paste the following line into it:
+在 monorepo 的根目录下，为你的数据库连接字符串创建一个 .env 文件。此文件应被添加到 .gitignore。将以下行粘贴到其中：
 
 DATABASE_URL="postgresql://myuser:mypassword@localhost:5432/codex_db"
 
-Start the database container:
+启动数据库容器：
 
 docker-compose up -d
 
-You can verify it's running with docker ps.
+步骤 4: 集成 Prisma
+现在，让我们使用 Prisma 将我们的 Nest.js 后端连接到数据库。
 
-Step 4: Integrate Prisma
-Now, let's connect our Nest.js backend to the database using Prisma.
-
-Install Prisma dependencies in the backend app. Because we are in a monorepo, we install them at the root.
+安装 Prisma 依赖项 到 monorepo 的根目录。
 
 npm install prisma --save-dev
 npm install @prisma/client
 
-Initialize Prisma within the backend application's directory structure.
+初始化 Prisma：
 
 npx prisma init --datasource-provider postgresql
 
-This command creates a prisma directory with a schema.prisma file and updates your .env file.
-
-Configure your Prisma Schema. Open the newly created prisma/schema.prisma file and replace its content with our defined models:
+配置你的 Prisma Schema (重要更新)。 打开新创建的 prisma/schema.prisma 文件，并将其内容替换为我们新的 v2 版本模型：
 
 generator client {
   provider = "prisma-client-js"
@@ -129,6 +125,7 @@ model Post {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   comments  Comment[]
+  labels    LabelOnPost[]
 }
 
 model Comment {
@@ -140,38 +137,42 @@ model Comment {
   postId    Int
 }
 
-Push the schema to your database. This command reads your schema and creates the corresponding tables (Post, Comment) in your running Docker database.
+model Label {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  posts LabelOnPost[]
+}
+
+model LabelOnPost {
+  post    Post   @relation(fields: [postId], references: [id])
+  postId  Int
+  label   Label  @relation(fields: [labelId], references: [id])
+  labelId Int
+  @@id([postId, labelId])
+}
+
+将 schema 推送到你的数据库。 此命令会读取你的 schema 并在你运行的 Docker 数据库中创建相应的表（Post, Comment, Label, _LabelToPost）。
 
 npx prisma db push
 
-Generate the Prisma Client. This creates the type-safe client you'll use in your services.
+生成 Prisma Client。
 
 npx prisma generate
 
-Step 5: Run the Full Stack
-Your environment is now fully configured.
-
-Install all dependencies for the monorepo:
+步骤 5: 运行全栈应用
+安装所有依赖项：
 
 npm install
 
-Run both applications concurrently. Nx makes this easy. Open your root package.json and add the following script:
+运行两个应用。 打开根目录的 package.json 并添加以下脚本：
 
 "scripts": {
   "dev": "nx run-many --target=serve --all"
 },
 
-Now, start everything with one command:
+现在，用一个命令启动所有服务：
 
 npm run dev
 
-3.0 Environment Ready
-You have successfully completed Phase 0. Your local environment is now running with:
-
-A Next.js frontend application.
-
-A Nest.js backend application.
-
-A PostgreSQL database running in Docker.
-
-Prisma connected to the database and ready for use in your backend.
+3.0 环境就绪
+你已成功完成 Phase 0。你的本地环境现在已配置完毕，并准备好开始 Phase 1 的开发。

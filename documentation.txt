@@ -1,238 +1,193 @@
-Project Plan: Personal Brand & Tech Blog (Project "Codex")
-Version: 1.0
+项目计划书：个人品牌技术博客 (Project "Codex") v2
+版本: 2.0
 
-Date: July 25, 2025
+日期: 2025年7月25日
 
-Authored By:
+制定人:
 
-Project Lead / Developer: You
+项目负责人 / 开发者: 你
 
-Chief Architect: Gemini
+首席架构师: Gemini
 
-1.0 Executive Summary
-This project outlines the development of a modern, high-performance, and scalable personal technology blog platform. It is engineered not merely as a content delivery tool, but as a comprehensive showcase of the project lead's technical capabilities, a perfect portfolio piece for career advancement, and the digital cornerstone of a future personal brand.
+1.0 项目概述 (Executive Summary)
+本项目旨在构建一个现代、高性能、可扩展的个人技术博客平台。它不仅是一个内容发布工具，更是项目负责人技术能力的综合体现、一个完美的求职作品集 (Portfolio Piece)、以及未来个人品牌的数字基石。
 
-Core Functionality:
+核心功能:
 
-A public-facing interface for reading articles and submitting anonymous comments.
+面向公众的文章阅读、搜索、按标签筛选以及匿名评论功能。
 
-A secure, admin-only backend for creating, editing, and managing articles via Markdown.
+一个安全的、仅供管理员使用的后台，用于通过Markdown创建、编辑和管理文章及标签。
 
-Target Users:
+目标用户:
 
-Readers: Internet users interested in technology, programming, and the author's shared content.
+读者: 对技术、编程和博主分享内容感兴趣的互联网用户。
 
-Administrator: The blog owner (You).
+管理员: 博主本人（即你）。
 
-2.0 Guiding Principles
-The following core principles will govern all technical decisions:
+2.0 架构原则 (Guiding Principles)
+我们将遵循以下核心原则来指导所有技术决策：
 
-Developer Experience First: Prioritize tools and patterns that maximize development efficiency and enjoyment. A happy developer builds superior products.
+开发者体验优先 (Developer Experience First): 选择能最大化开发效率和愉悦度的工具与模式。
 
-Clear Separation of Concerns: The frontend is exclusively responsible for user experience and presentation; the backend is exclusively responsible for business logic and data. Communication occurs via a standardized API contract, ensuring high decoupling.
+前后端明确分离 (Clear Separation of Concerns): 前端专注于用户体验，后端专注于业务逻辑。通过标准化的API合约进行通信。
 
-End-to-End Type Safety: From the database schema to the API layer to the frontend UI, we will leverage TypeScript and Prisma to enforce full-stack type safety, maximally reducing runtime errors.
+类型安全贯穿始终 (End-to-End Type Safety): 利用TypeScript和Prisma实现全链路类型安全，减少运行时错误。
 
-Deployment-Ready from Day One: All development work will be conducted in an environment that mirrors production as closely as possible, with automated CI/CD pipelines established from the outset.
+从第一天起就考虑部署 (Deployment-Ready from Day One): 所有开发工作都应在与生产环境一致的环境中进行，并建立自动化的CI/CD流程。
 
-Security by Design: Security measures, particularly for administrative access, are to be considered integral to the architectural design phase, not as an afterthought.
+安全并非事后添加 (Security by Design): 安全措施（特别是后台访问控制）必须在架构设计阶段就予以考虑。
 
-3.0 Technology Stack & Justification
-Layer
+3.0 技术栈选型与理由 (Technology Stack & Justification)
+层面
 
-Technology Selection
+技术选型
 
-Justification
+理由 (Justification)
 
-Frontend
+前端
 
 Next.js (App Router)
 
-The de-facto standard for the React ecosystem, offering hybrid SSG/SSR rendering capabilities for superior performance and SEO.
+React生态系统的事实标准，提供SSG/SSR混合渲染能力，性能优异，SEO友好。
 
-Backend
+后端
 
 Nest.js
 
-An enterprise-grade Node.js framework built on TypeScript. Its modularity and Dependency Injection design enable highly maintainable and scalable backend services.
+基于TypeScript的企业级Node.js框架，其模块化和依赖注入设计能构建出高度可维护和可扩展的后端服务。
 
-Database ORM
+数据库ORM
 
 Prisma
 
-A next-generation ORM providing an unparalleled, type-safe database access experience. Integrates flawlessly with Nest.js and PostgreSQL.
+下一代ORM，提供无与伦比的类型安全数据库操作体验，能与Nest.js和PostgreSQL完美集成。
 
-Database
+数据库
 
 PostgreSQL
 
-The most powerful open-source relational database, renowned for performance, extensibility, and robust community support. The preferred choice for modern applications.
+功能最强大的开源关系型数据库，性能卓越，社区活跃，是现代应用的首选。
 
-Code Repository
+代码仓库
 
-Monorepo (w/ Nx or Turborepo)
+Monorepo (使用 Nx 或 Turborepo)
 
-Manages frontend and backend code within a single repository, facilitating code sharing (especially type definitions) and simplifying dependency management and build processes.
+在单一仓库中管理前后端代码，便于代码共享（尤其是类型定义），简化依赖管理和统一构建流程。
 
-4.0 System Architecture
-Database Schema (schema.prisma): [As defined in our previous communication, containing Post and Comment models and their relation. This model is considered final.]
+4.0 系统架构设计 (System Architecture)
+数据库模式 (schema.prisma) v2:
 
-API Contract: The backend will strictly adhere to the following RESTful API design.
+model Post {
+  id        Int       @id @default(autoincrement())
+  title     String    @unique
+  slug      String    @unique
+  content   String
+  published Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  comments  Comment[]
+  labels    LabelOnPost[] // 多对多关系
+}
 
-// --- Public APIs ---
-GET    /api/posts                  // Fetches a list of all published posts
-GET    /api/posts/:slug            // Fetches a single post by its slug
-GET    /api/posts/:postId/comments // Fetches all comments for a post
-POST   /api/posts/:postId/comments // Creates a new comment for a post
+model Comment {
+  id        Int      @id @default(autoincrement())
+  username  String
+  content   String
+  createdAt DateTime @default(now())
+  post      Post     @relation(fields: [postId], references: [id])
+  postId    Int
+}
 
-// --- Admin Auth APIs ---
-POST   /api/auth/login             // Administrator login
+model Label {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  posts LabelOnPost[] // 多对多关系
+}
 
-// --- Protected Admin APIs (Requires JWT) ---
-GET    /api/admin/posts            // Fetches all posts (including drafts)
-POST   /api/admin/posts            // Creates a new post
-PUT    /api/admin/posts/:id        // Updates an existing post
-DELETE /api/admin/posts/:id        // Deletes a post
+// 显式的多对多关系连接表
+model LabelOnPost {
+  post    Post   @relation(fields: [postId], references: [id])
+  postId  Int
+  label   Label  @relation(fields: [labelId], references: [id])
+  labelId Int
 
-5.0 DevOps Strategy
-Environment Strategy:
+  @@id([postId, labelId])
+}
 
-Local: Utilize docker-compose to run a local, simulated PostgreSQL database. Frontend and backend are started via dev scripts.
+API合约 (API Contract) v2:
 
-Production: Deployed on public cloud infrastructure.
+// --- 公共 API ---
+GET    /api/posts                  // 获取所有已发布的文章列表
+GET    /api/posts/:slug            // 获取单篇文章详情
+GET    /api/posts/:postId/comments // 获取一篇文章的所有评论
+POST   /api/posts/:postId/comments // 创建一条新评论
+GET    /api/search?q=:query        // [新增] 根据关键词搜索文章
+GET    /api/labels                 // [新增] 获取所有标签列表
+GET    /api/labels/:name           // [新增] 获取特定标签下的所有文章
 
-Version Control: Employ a simplified Git Flow.
+// --- 管理员认证 API ---
+POST   /api/auth/login             // 管理员登录
 
-main: The primary branch, always in a deployable state, mirroring the production environment.
+// --- 受保护的管理 API (需要JWT) ---
+GET    /api/admin/posts            // 获取所有文章（包括草稿）
+POST   /api/admin/posts            // 创建新文章 (请求体包含标签)
+PUT    /api/admin/posts/:id        // 更新文章 (请求体包含标签)
+DELETE /api/admin/posts/:id        // 删除文章
 
-develop: The main development branch. All new features are branched from here.
+5.0 开发与部署策略 (DevOps Strategy)
+(此部分无变更)
 
-feat/...: Feature branches (e.g., feat/comments). Merged back into develop upon completion.
+6.0 分阶段执行路线图 (Phased Execution Roadmap) v2
+Phase 0: 奠基与设置 (Foundation - 预计0.5周)
 
-Containerization: Author a Dockerfile for the Nest.js backend application to ensure environmental consistency.
+(无变更)
 
-Continuous Integration/Continuous Deployment (CI/CD):
+Phase 1: 核心内容MVP (Core MVP - 预计1周)
 
-Tool: GitHub Actions.
+(无变更)
 
-Workflow: Pushing to the main branch automatically triggers the CI/CD pipeline:
+Phase 2: 管理员后台与内容管理 (Admin & CMS - 预计1.5周)
 
-Run tests (Lint, Unit Tests).
+目标: 实现安全的内容创建和管理功能，包括标签管理。
 
-Build the frontend application and the backend Docker image.
+可交付成果:
 
-Deploy the frontend application to Vercel.
+后端: AuthModule 开发完成。
 
-Push the backend Docker image to a registry (e.g., Docker Hub) and deploy to the cloud host.
+后端: 所有受保护的文章管理API (POST, PUT, DELETE) 开发完成，并处理标签关系。
 
-Hosting:
+前端: 创建/admin路由，包含登录页、文章列表管理页、Markdown新建/编辑页面。
 
-Frontend (Next.js): Vercel. Provides seamless integration with Next.js, a global CDN, and a generous free tier.
+前端: 在新建/编辑页面中集成标签输入组件。
 
-Backend (Nest.js): Railway or Fly.io. These platforms offer excellent Docker support, a simple deployment experience, and free tiers.
+里程碑: 博主可以端到端地登录、发布、编辑（包括标签）和管理文章。
 
-Database (PostgreSQL): Neon or Supabase. Provide dedicated, managed cloud database services with robust free tiers.
+Phase 3: 内容发现与互动 (Content Discovery & Interaction - 预计1.5周)
 
-6.0 Phased Execution Roadmap
-The project is decomposed into manageable sprints, each with clear objectives and deliverables.
+目标: 实现搜索、标签筛选和评论功能。
 
-Phase 0: Foundation & Setup (Est. 0.5 Weeks)
+可交付成果:
 
-Objective: Build the project skeleton and ensure the toolchain is operational.
+搜索功能: 后端实现搜索API，前端实现搜索栏和搜索结果页。
 
-Deliverables:
+标签功能: 后端实现按标签筛选文章的API，前端实现标签归档页，并在文章卡片和详情页展示可点击的标签。
 
-Initialized Monorepo using Nx or Turborepo.
+评论功能: 后端实现评论API，前端实现可交互的评论区组件。
 
-ESLint, Prettier, and TypeScript configured.
+Phase 4: 打磨、优化与上线 (Polish & Launch - 预计1周)
 
-Local Dockerized PostgreSQL instance runs successfully.
+(无变更)
 
-"Hello World" frontend and backend applications can start and communicate.
+7.0 风险评估与缓解措施 (Risk Assessment & Mitigation)
+(此部分无变更)
 
-prisma.schema file created and the initial database migration is complete.
+8.0 成功标准 (Definition of Success)
+功能性标准:
 
-Phase 1: Core Content MVP (Est. 1 Week)
+访客可以流畅地浏览、搜索和按标签筛选文章。
 
-Objective: Implement the core "read-only" functionality of the blog.
+访客可以成功提交评论。
 
-Deliverables:
+管理员可以登录后台，并完整地执行文章的增删改查操作，包括管理标签。
 
-Backend: GET /posts and GET /posts/:slug endpoints are developed and tested.
-
-Frontend: The Home page (post list) and Post Detail page are developed.
-
-Data can be manually seeded into the database and is correctly displayed by the frontend.
-
-Initial deployment to Vercel and Railway is completed, resulting in a publicly accessible, read-only blog.
-
-Phase 2: Admin Panel & CMS (Est. 1.5 Weeks)
-
-Objective: Implement secure content creation and management capabilities.
-
-Deliverables:
-
-Backend: The AuthModule is complete, providing a login endpoint and a JWT validation Guard.
-
-Backend: All protected admin APIs (POST, PUT, DELETE) are developed.
-
-Frontend: The /admin route is created, including a login page, post management list, and a Markdown-based new/edit page.
-
-Milestone: The administrator can perform end-to-end login, publishing, and management of articles.
-
-Phase 3: User Interaction (Est. 1 Week)
-
-Objective: Implement the commenting feature.
-
-Deliverables:
-
-Backend: The CommentModule APIs are developed.
-
-Frontend: An interactive comment section component (displaying comments, submitting new ones) is developed for the Post Detail page.
-
-Basic anti-spam measures (e.g., backend rate-limiting) are in place.
-
-Phase 4: Polish & Launch (Est. 1 Week)
-
-Objective: Conduct a full review and optimization of the project for its official launch.
-
-Deliverables:
-
-Responsive Design QA: Ensure an excellent reading experience on mobile, tablet, and desktop.
-
-Performance Optimization: Image lazy-loading, code-splitting, Lighthouse score improvements.
-
-SEO Optimization: Appropriate <title> and <meta> tags are implemented for all pages.
-
-A personal domain is purchased and configured.
-
-1-3 initial articles are written and officially published.
-
-7.0 Risk Assessment & Mitigation
-Risk 1 (Technical): Underestimating the complexity of Nest.js or Prisma, leading to development delays.
-
-Mitigation: Adhere strictly to official documentation. Build from the simplest modules outwards. Prioritize official issue trackers and Stack Overflow for problem-solving.
-
-Risk 2 (Scope): Scope creep; the temptation to add "cool" but non-essential features (e.g., full-text search, likes) before core functionality is complete.
-
-Mitigation: Strict adherence to the phased roadmap. All new ideas are to be logged in a "Future Features" backlog and considered only after v1.0 is successfully launched.
-
-Risk 3 (Security): Flaws in the backend authentication logic leading to unauthorized access.
-
-Mitigation: Allocate sufficient time during Phase 2 to rigorously test the AuthModule and AuthGuard. Use mature, battle-tested libraries (e.g., @nestjs/jwt) and do not "roll your own" cryptography.
-
-8.0 Definition of Success
-Functional Criteria:
-
-Visitors can fluidly browse the post list and post detail pages.
-
-Visitors can successfully submit comments and see them appear immediately.
-
-The administrator can log in to the admin panel and perform all CRUD operations on posts.
-
-Non-Functional Criteria:
-
-Core pages achieve a Google Lighthouse performance score of >90.
-
-The codebase has reasonable test coverage (Unit/Integration tests).
-
+非功能性标准: (无变更)
