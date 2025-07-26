@@ -37,4 +37,5 @@ git pull origin main || { echo "拉取 main 失败！"; exit 1; }
 git merge yimgao/develop || { echo "合并 yimgao/develop 到 main 失败！"; exit 1; }
 git push origin main || { echo "推送 main 失败！"; exit 1; }
 
+git checkout yimgao/feat || { echo "切换到 yimgao/feat 失败！"; exit 1; }
 echo "所有操作成功完成！"
